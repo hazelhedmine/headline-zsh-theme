@@ -74,7 +74,7 @@ IS_SSH=$?
 # The style aliases for ANSI SGR codes (defined above) can be used there too
 
 # Options
-HEADLINE_LINE_MODE='auto' # on|auto|off (whether to print the line above the prompt)
+HEADLINE_LINE_MODE='on' # on|auto|off (whether to print the line above the prompt)
 HEADLINE_INFO_MODE='precmd' # precmd|prompt (whether info line is in $PROMPT or printed by precmd)
   # use "precmd" for window resize to work properly (but Ctrl+L doesn't show info line)
   # use "prompt" for Ctrl+L to clear properly (but window resize eats previous output)
@@ -94,10 +94,10 @@ HEADLINE_LINE_CHAR='_' # line above information
 HEADLINE_PAD_CHAR=' ' # space between <path> and <branch>
 
 # Prefixes (optional)
-HEADLINE_USER_PREFIX='' # consider " "
-HEADLINE_HOST_PREFIX='' # consider " "
-HEADLINE_PATH_PREFIX='' # consider " "
-HEADLINE_BRANCH_PREFIX='' # consider " "
+HEADLINE_USER_PREFIX=' ' # consider " "
+HEADLINE_HOST_PREFIX=' ' # consider " "
+HEADLINE_PATH_PREFIX=' ' # consider " "
+HEADLINE_BRANCH_PREFIX=' ' # consider " "
 
 # Joints
 HEADLINE_USER_BEGIN=''
