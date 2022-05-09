@@ -57,6 +57,11 @@ source your/path/to/headline.zsh-theme
 
 More details on the wiki page: [Installation](https://github.com/Moarram/headline/wiki/Installation)
 
+Copy the theme file to the custom theme directory with the following command:
+```
+cp headline.zsh-theme $ZSH_CUSTOM/themes/
+```
+
 <br>
 
 
