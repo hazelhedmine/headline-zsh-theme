@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Headline ZSH Prompt
-# Copyright (c) 2021 Moarram under the MIT License
+# Copyright (c) 2022 Moarram under the MIT License
 
 # To install, source this file from your .zshrc file
 # Customization variables begin around line 70
@@ -19,7 +19,6 @@ invert=$'\e[7m'
 # ...
 
 # Foreground color aliases
-# (dont change these definitions, apply them below)
 black=$'\e[30m'
 red=$'\e[31m'
 green=$'\e[32m'
@@ -38,7 +37,6 @@ light_cyan=$'\e[96m'
 light_white=$'\e[97m'
 
 # Background color aliases
-# (dont change these definitions, apply them below)
 black_back=$'\e[40m'
 red_back=$'\e[41m'
 green_back=$'\e[42m'
@@ -56,7 +54,7 @@ light_magenta_back=$'\e[105m'
 light_cyan_back=$'\e[106m'
 light_white_back=$'\e[107m'
 
-# User defined colors
+# Custom colors
 # REF: https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_(Select_Graphic_Rendition)_parameters
 # orange_yellow=$'\e[38;5;214m' # example 8-bit color
 # orange_brown=$'\e[38;2;191;116;46m' # example rgb color
@@ -64,43 +62,32 @@ light_white_back=$'\e[107m'
 
 # Flags
 ! [ -z "$SSH_TTY$SSH_CONNECTION$SSH_CLIENT" ]
-IS_SSH=$?
+IS_SSH=$? # 0=true, 1=false
 
 
 
 # ------------------------------------------------------------------------------
 # Customization
-# I recommend setting these variables in your ~/.zshrc after sourcing this file
+# Use the following variables to customize the theme
+# These variables can also be set in your ~/.zshrc after sourcing this file
 # The style aliases for ANSI SGR codes (defined above) can be used there too
 
-# Options
-HEADLINE_LINE_MODE='on' # on|auto|off (whether to print the line above the prompt)
-HEADLINE_INFO_MODE='precmd' # precmd|prompt (whether info line is in $PROMPT or printed by precmd)
-  # use "precmd" for window resize to work properly (but Ctrl+L doesn't show info line)
-  # use "prompt" for Ctrl+L to clear properly (but window resize eats previous output)
+# Info sources (enclose in single quotes as these will be eval'd, use empty string to hide segment)
+HEADLINE_USER_CMD='echo $USER'
+HEADLINE_HOST_CMD='hostname -s' # consider 'basename "$VIRTUAL_ENV"' to replace host with environment
+HEADLINE_PATH_CMD='print -rP "%~"'
+HEADLINE_GIT_BRANCH_CMD='headline_git_branch'
+HEADLINE_GIT_STATUS_CMD='headline_git_status'
 
-# Segments
-HEADLINE_DO_USER='true'
-HEADLINE_DO_HOST='true'
-HEADLINE_DO_PATH='true'
-HEADLINE_DO_GIT_BRANCH='true'
-HEADLINE_DO_GIT_STATUS='true'
-
-# Prompt character
-HEADLINE_PROMPT="%(#.#.%(!.!.$)) " # consider "%#"
-
-# Repeated characters (no styles here)
-HEADLINE_LINE_CHAR='_' # line above information
-HEADLINE_PAD_CHAR=' ' # space between <path> and <branch>
-
-# Prefixes (optional)
+# Info symbols (optional)
 HEADLINE_USER_PREFIX=' ' # consider " "
-HEADLINE_HOST_PREFIX=' ' # consider " "
+HEADLINE_HOST_PREFIX=' ' # consider " "
 HEADLINE_PATH_PREFIX=' ' # consider " "
-HEADLINE_BRANCH_PREFIX=' ' # consider " "
+HEADLINE_BRANCH_PREFIX=' ' # consider " "
 
-# Joints
+# Info joints
 HEADLINE_USER_BEGIN=''
+if [ $IS_SSH = 0 ]; then HEADLINE_USER_BEGIN='=> '; fi
 HEADLINE_USER_TO_HOST=' @ '
 HEADLINE_HOST_TO_PATH=': '
 HEADLINE_PATH_TO_BRANCH=' | ' # only used when no padding between <path> and <branch>
@@ -110,20 +97,33 @@ HEADLINE_BRANCH_TO_STATUS=' ['
 HEADLINE_STATUS_TO_STATUS='' # between each status section, consider "]"
 HEADLINE_STATUS_END=']'
 
-# Info styles (ANSI SGR codes)
+# Info padding character
+HEADLINE_PAD_CHAR=' ' # repeated for space between <path> and <branch>
+
+# Info truncation symbol
+HEADLINE_TRUNC_PREFIX='...' # shown where <path> or <branch> is truncated, consider "…"
+
+# Info styles
 HEADLINE_STYLE_DEFAULT='' # style applied to entire info line
 HEADLINE_STYLE_JOINT=$light_black
-if [ $IS_SSH = 0 ]; then
-  HEADLINE_STYLE_USER=$bold$magenta
-else
-  HEADLINE_STYLE_USER=$bold$red
-fi
+HEADLINE_STYLE_USER=$bold$red
 HEADLINE_STYLE_HOST=$bold$yellow
 HEADLINE_STYLE_PATH=$bold$blue
 HEADLINE_STYLE_BRANCH=$bold$cyan
 HEADLINE_STYLE_STATUS=$bold$magenta
 
-# Line styles
+# Info options
+HEADLINE_INFO_MODE=precmd # precmd|prompt (whether info line is in PROMPT or printed by precmd)
+  # use "precmd" for window resize to work properly (but Ctrl+L doesn't show info line)
+  # use "prompt" for Ctrl+L to clear properly (but window resize eats previous output)
+
+# Separator options
+HEADLINE_LINE_MODE=on # on|auto|off (whether to print the line above the prompt)
+
+# Separator character
+HEADLINE_LINE_CHAR='_' # repeated for line above information
+
+# Separator styles
 HEADLINE_STYLE_JOINT_LINE=$HEADLINE_STYLE_JOINT
 HEADLINE_STYLE_USER_LINE=$HEADLINE_STYLE_USER
 HEADLINE_STYLE_HOST_LINE=$HEADLINE_STYLE_HOST
@@ -134,11 +134,7 @@ HEADLINE_STYLE_STATUS_LINE=$HEADLINE_STYLE_STATUS
 # Git branch characters
 HEADLINE_GIT_HASH=':' # hash prefix to distinguish from branch
 
-# Git status options
-HEADLINE_DO_GIT_STATUS_COUNTS='false' # set "true" to show count of each status
-HEADLINE_DO_GIT_STATUS_OMIT_ONE='false' # set "true" to omit the status number when it is 1
-
-# Git status styles and characters
+# Git status characters
 # To set individual status styles use "%{$reset<style>%}<char>"
 HEADLINE_GIT_STAGED='+'
 HEADLINE_GIT_CHANGED='!'
@@ -150,6 +146,25 @@ HEADLINE_GIT_STASHED='*'
 HEADLINE_GIT_CONFLICTS='✘' # consider "%{$red%}✘"
 HEADLINE_GIT_CLEAN='' # consider "✓" or "✔"
 
+# Git status options
+HEADLINE_DO_GIT_STATUS_COUNTS=false # set "true" to show count of each status
+HEADLINE_DO_GIT_STATUS_OMIT_ONE=false # set "true" to omit the status number when it is 1
+
+# Prompt
+HEADLINE_PROMPT='%(#.#.%(!.!.$)) ' # consider "%#"
+HEADLINE_RPROMPT=''
+
+# Clock (prepends to RPROMPT)
+HEADLINE_DO_CLOCK=true # whether to show the clock
+HEADLINE_STYLE_CLOCK=$faint
+HEADLINE_CLOCK_FORMAT='%l:%M:%S %p' # consider "%+" for full date (see man strftime)
+
+# Exit code
+HEADLINE_DO_ERR=false # whether to show non-zero exit codes above prompt
+HEADLINE_DO_ERR_INFO=true # whether to show exit code meaning as well
+HEADLINE_ERR_PREFIX='→ '
+HEADLINE_STYLE_ERR=$italic$faint
+
 # ------------------------------------------------------------------------------
 
 
@@ -158,6 +173,8 @@ HEADLINE_GIT_CLEAN='' # consider "✓" or "✔"
 setopt PROMPT_SP # always start prompt on new line
 setopt PROMPT_SUBST # substitutions
 autoload -U add-zsh-hook
+PROMPT_EOL_MARK='' # remove weird % symbol
+ZLE_RPROMPT_INDENT=0 # remove extra space
 
 # Local variables
 _HEADLINE_LINE_OUTPUT='' # separator line
@@ -169,7 +186,7 @@ fi
 
 # Calculate length of string, excluding formatting characters
 # REF: https://old.reddit.com/r/zsh/comments/cgbm24/multiline_prompt_the_missing_ingredient/
-headline_prompt_len() {
+headline_prompt_len() { # (str, num)
   emulate -L zsh
   local -i COLUMNS=${2:-COLUMNS}
   local -i x y=${#1} m
@@ -194,6 +211,33 @@ headline_repeat_char() { # (char, num)
     str+=$1
   done
   echo $str
+}
+
+# Guess the exit code meaning
+headline_exit_meaning() { # (num)
+  # REF: https://tldp.org/LDP/abs/html/exitcodes.html
+  # REF: https://man7.org/linux/man-pages/man7/signal.7.html
+  # NOTE: these meanings are not standardized
+  case $1 in
+    126) echo 'Command cannot execute';;
+    127) echo 'Command not found';;
+    129) echo 'Hangup';;
+    130) echo 'Interrupted';;
+    131) echo 'Quit';;
+    132) echo 'Illegal instruction';;
+    133) echo 'Trapped';;
+    134) echo 'Aborted';;
+    135) echo 'Bus error';;
+    136) echo 'Arithmetic error';;
+    137) echo 'Killed';;
+    138) echo 'User signal 1';;
+    139) echo 'Segmentation fault';;
+    140) echo 'User signal 2';;
+    141) echo 'Pipe error';;
+    142) echo 'Alarm';;
+    143) echo 'Terminated';;
+    *) ;;
+  esac
 }
 
 
@@ -317,65 +361,100 @@ headline_preexec() {
 # Before prompting
 add-zsh-hook precmd headline_precmd
 headline_precmd() {
+  local err=$?
+
   # Information
   local user_str host_str path_str branch_str status_str
-  [[ $HEADLINE_DO_USER == 'true' ]] && user_str=$USER
-  [[ $HEADLINE_DO_HOST == 'true' ]] && host_str=$(hostname -s)
-  [[ $HEADLINE_DO_PATH == 'true' ]] && path_str=$(print -rP '%~')
-  [[ $HEADLINE_DO_GIT_BRANCH == 'true' ]] && branch_str=$(headline_git_branch)
-  [[ $HEADLINE_DO_GIT_STATUS == 'true' ]] && status_str=$(headline_git_status)
-
-  # Trimming
-  if (( $COLUMNS < 35 && ${#path_str} )); then
-    user_str=''; host_str=''
-  elif (( $COLUMNS < 55 )); then
-    user_str="${user_str:0:1}"
-    host_str="${host_str:0:1}"
-  fi
+  user_str=$(eval $HEADLINE_USER_CMD)
+  host_str=$(eval $HEADLINE_HOST_CMD)
+  path_str=$(eval $HEADLINE_PATH_CMD)
+  branch_str=$(eval $HEADLINE_GIT_BRANCH_CMD)
+  status_str=$(eval $HEADLINE_GIT_STATUS_CMD)
 
   # Shared variables
-  _HEADLINE_LEN=0
-  _HEADLINE_LEN_SUM=0
+  _HEADLINE_LEN_REMAIN=$COLUMNS
   _HEADLINE_INFO_LEFT=''
   _HEADLINE_LINE_LEFT=''
   _HEADLINE_INFO_RIGHT=''
   _HEADLINE_LINE_RIGHT=''
 
-  # Prompt construction
-  local git_len len
+  # Git status
   if (( ${#status_str} )); then
     _headline_part JOINT "$HEADLINE_STATUS_END" right
     _headline_part STATUS "$HEADLINE_STATUS_PREFIX$status_str" right
     _headline_part JOINT "$HEADLINE_BRANCH_TO_STATUS" right
+    if (( $_HEADLINE_LEN_REMAIN < ${#HEADLINE_PAD_TO_BRANCH} + ${#HEADLINE_BRANCH_PREFIX} + ${#HEADLINE_TRUNC_PREFIX} )); then
+      user_str=''; host_str=''; path_str=''; branch_str=''
+    fi
   fi
+
+  # Git branch
+  local len=$(( $_HEADLINE_LEN_REMAIN - ${#HEADLINE_BRANCH_PREFIX} ))
   if (( ${#branch_str} )); then
-    _headline_part BRANCH "$HEADLINE_BRANCH_PREFIX$branch_str" right
+    if (( $len < ${#HEADLINE_PATH_PREFIX} + ${#HEADLINE_TRUNC_PREFIX} + ${#HEADLINE_PATH_TO_BRANCH} + ${#branch_str} )); then
+      path_str=''
+    fi
+    if (( ${#path_str} )); then
+      len=$(( $len - ${#HEADLINE_PATH_PREFIX} - ${#HEADLINE_PATH_TO_BRANCH} ))
+    else
+      len=$(( $len - ${#HEADLINE_PAD_TO_BRANCH} ))
+    fi
+    _headline_part BRANCH "$HEADLINE_BRANCH_PREFIX%$len<$HEADLINE_TRUNC_PREFIX<$branch_str%<<" right
   fi
-  git_len=$_HEADLINE_LEN_SUM
+
+  # Trimming
+  local joint_len=$(( ${#HEADLINE_USER_BEGIN} + ${#HEADLINE_USER_TO_HOST} + ${#HEADLINE_HOST_TO_PATH} + ${#HEADLINE_PATH_TO_BRANCH} ))
+  local path_min_len=$(( ${#path_str} + ${#HEADLINE_PATH_PREFIX} > 25 ? 25 : ${#path_str} + ${#HEADLINE_PATH_PREFIX} ))
+  len=$(( $_HEADLINE_LEN_REMAIN - $path_min_len - $joint_len ))
+  if (( $len < 2 )); then
+    user_str=''; host_str=''
+  elif (( $len < ${#user_str} + ${#host_str} )); then
+    user_str="${user_str:0:1}"
+    host_str="${host_str:0:1}"
+  fi
+
+  # User
   if (( ${#user_str} )); then
     _headline_part JOINT "$HEADLINE_USER_BEGIN" left
     _headline_part USER "$HEADLINE_USER_PREFIX$user_str" left
   fi
+
+  # Host
   if (( ${#host_str} )); then
     if (( ${#_HEADLINE_INFO_LEFT} )); then
       _headline_part JOINT "$HEADLINE_USER_TO_HOST" left
     fi
     _headline_part HOST "$HEADLINE_HOST_PREFIX$host_str" left
   fi
+
+  # Path
   if (( ${#path_str} )); then
     if (( ${#_HEADLINE_INFO_LEFT} )); then
       _headline_part JOINT "$HEADLINE_HOST_TO_PATH" left
     fi
-    len=$(( $COLUMNS - $_HEADLINE_LEN_SUM - ( $git_len ? ${#HEADLINE_PATH_TO_BRANCH} + ${#HEADLINE_PATH_PREFIX} : 0 ) ))
-    _headline_part PATH "$HEADLINE_PATH_PREFIX%$len<...<$path_str%<<" left
+    len=$(( $_HEADLINE_LEN_REMAIN - ${#HEADLINE_PATH_PREFIX} - ( ${#branch_str} ? ${#HEADLINE_PATH_TO_BRANCH} : 0 ) ))
+    _headline_part PATH "$HEADLINE_PATH_PREFIX%$len<$HEADLINE_TRUNC_PREFIX<$path_str%<<" left
   fi
-  len=$(( $COLUMNS - $_HEADLINE_LEN_SUM - ${#HEADLINE_PATH_TO_PAD} - ${#HEADLINE_PAD_TO_BRANCH} ))
-  if (( $git_len && $COLUMNS - $_HEADLINE_LEN_SUM <= ${#HEADLINE_PATH_TO_BRANCH} )); then
+
+  # Padding
+  if (( ${#branch_str} && ${#path_str} && $_HEADLINE_LEN_REMAIN <= ${#HEADLINE_PATH_TO_BRANCH} )); then
     _headline_part JOINT "$HEADLINE_PATH_TO_BRANCH" left
   else
+    if (( ${#branch_str} )); then
+      _headline_part JOINT "$HEADLINE_PAD_TO_BRANCH" right
+    fi
     _headline_part JOINT "$HEADLINE_PATH_TO_PAD" left
-    _headline_part JOINT "$(headline_repeat_char $HEADLINE_PAD_CHAR $len)" left
-    _headline_part JOINT "$HEADLINE_PAD_TO_BRANCH" left
+    _headline_part JOINT "$(headline_repeat_char $HEADLINE_PAD_CHAR $_HEADLINE_LEN_REMAIN)" left
+  fi
+
+  # Error line
+  if [[ $HEADLINE_DO_ERR == 'true' ]] && (( $err )); then
+    local meaning msg
+    if [[ $HEADLINE_DO_ERR_INFO == 'true' ]]; then
+      meaning=$(headline_exit_meaning $err)
+      (( ${#meaning} )) && msg=" ($meaning)"
+    fi
+    print -rP "$HEADLINE_STYLE_ERR$HEADLINE_ERR_PREFIX$err$msg"
   fi
 
   # Separator line
@@ -387,20 +466,32 @@ headline_precmd() {
 
   # Information line
   _HEADLINE_INFO_OUTPUT="$_HEADLINE_INFO_LEFT$_HEADLINE_INFO_RIGHT$reset"
+
+  # Prompt
   if [[ $HEADLINE_INFO_MODE == 'precmd' ]]; then
     print -rP $_HEADLINE_INFO_OUTPUT
+    PROMPT=$HEADLINE_PROMPT
+  else
+    PROMPT='$(print -rP $_HEADLINE_INFO_OUTPUT; print -rP $HEADLINE_PROMPT)'
+  fi
+
+  # Right prompt
+  if [[ $HEADLINE_DO_CLOCK == 'true' ]]; then
+    RPROMPT='%{$HEADLINE_STYLE_CLOCK%}$(date +$HEADLINE_CLOCK_FORMAT)%{$reset%}$HEADLINE_RPROMPT'
+  else
+    RPROMPT=$HEADLINE_RPROMPT
   fi
 }
 
 # Create a part of the prompt
 _headline_part() { # (name, content, side)
-  local style info line
+  local style info info_len line
   eval style="\$reset\$HEADLINE_STYLE_DEFAULT\$HEADLINE_STYLE_${1}"
   info="%{$style%}$2"
-  _HEADLINE_LEN=$(headline_prompt_len $info 9999)
-  _HEADLINE_LEN_SUM=$(( $_HEADLINE_LEN_SUM + $_HEADLINE_LEN ))
+  info_len=$(headline_prompt_len $info 9999)
+  _HEADLINE_LEN_REMAIN=$(( $_HEADLINE_LEN_REMAIN - $info_len ))
   eval style="\$reset\$HEADLINE_STYLE_${1}_LINE"
-  line="%{$style%}$(headline_repeat_char $HEADLINE_LINE_CHAR $_HEADLINE_LEN)"
+  line="%{$style%}$(headline_repeat_char $HEADLINE_LINE_CHAR $info_len)"
   if [[ $3 == 'right' ]]; then
     _HEADLINE_INFO_RIGHT="$info$_HEADLINE_INFO_RIGHT"
     _HEADLINE_LINE_RIGHT="$line$_HEADLINE_LINE_RIGHT"
@@ -409,15 +500,3 @@ _headline_part() { # (name, content, side)
     _HEADLINE_LINE_LEFT="$_HEADLINE_LINE_LEFT$line"
   fi
 }
-
-# Prompt
-headline_output() {
-  print -rP $_HEADLINE_INFO_OUTPUT
-  print -rP $HEADLINE_PROMPT
-}
-if [[ $HEADLINE_INFO_MODE == 'precmd' ]]; then
-  PROMPT=$HEADLINE_PROMPT # line and info printed by precmd
-else
-  PROMPT='$(headline_output)' # only line printed by precmd
-fi
-PROMPT_EOL_MARK=''
